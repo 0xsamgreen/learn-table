@@ -33,6 +33,24 @@ The main implementation is in `main.py`. The model:
 - Trains a neural network to predict table values
 - Includes validation to test predictions
 
+Example output:
+```
+Validating model predictions...
+
+Position        Predicted    Actual       Abs Error   
+---------------------------------------------------
+(0, 0)          8.5921       8.8227       0.2306      
+(0, 9)          3.2682       1.3319       1.9364      
+(999, 0)        8.4575       7.3372       1.1203      
+(999, 9)        4.4647       4.1109       0.3538      
+(500, 5)        5.4440       4.8687       0.5753      
+(250, 3)        3.3347       3.1535       0.1812      
+(750, 7)        3.9537       4.0664       0.1127      
+(123, 4)        8.1307       8.8068       0.6761      
+(867, 2)        4.0347       4.6205       0.5858      
+(432, 8)        6.8689       6.4951       0.3737
+```
+
 The `CompactTablePredictor` class provides the core functionality:
 - `__init__`: Initialize model with number of rows, columns, and embedding dimension
 - `forward`: Make predictions given input coordinates
