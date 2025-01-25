@@ -9,6 +9,7 @@ A PyTorch-based neural network implementation for learning and predicting values
 - Support for large tables (tested with 1000x10 dimensions)
 - Normalized inputs and outputs for stable training
 - GPU support (MPS/CUDA) when available
+- Multiple training strategies to handle catastrophic forgetting
 
 ## Requirements
 
@@ -24,9 +25,11 @@ A PyTorch-based neural network implementation for learning and predicting values
 pip install -r requirements.txt
 ```
 
-## Usage
+## Implementations
 
-The main implementation is in `main.py`. The model:
+### Simple Implementation (simple.py)
+
+The basic implementation trains on the entire table in each epoch:
 
 - Creates a random table for training
 - Uses embeddings to represent row and column positions
@@ -51,10 +54,23 @@ Position        Predicted    Actual       Abs Error
 (432, 8)        6.8689       6.4951       0.3737
 ```
 
-The `CompactTablePredictor` class provides the core functionality:
-- `__init__`: Initialize model with number of rows, columns, and embedding dimension
-- `forward`: Make predictions given input coordinates
-- Built-in weight initialization for optimal training
+### Complex Implementation (complex.py)
+
+An enhanced version that addresses catastrophic forgetting when training on partial data:
+
+- Trains on only 10% of the table entries per epoch
+- Uses Experience Replay to maintain memory of past examples:
+  * Stores up to 5000 previous training examples
+  * Each batch combines 70% new data with 30% replay data
+  * Random replacement strategy for buffer management
+- Validates on random positions every 100 epochs
+- Shows improved stability and reduced forgetting
+
+Key improvements over simple.py:
+- More stable learning across epochs
+- Better retention of previously learned patterns
+- Reduced maximum prediction errors
+- More consistent predictions across different table positions
 
 ## Model Architecture
 
@@ -62,3 +78,17 @@ The `CompactTablePredictor` class provides the core functionality:
 - Concatenated with normalized position features
 - Three-layer neural network with LayerNorm and GELU activations
 - MSE loss function with AdamW optimizer
+
+### CompactTablePredictor Class
+
+The core model class provides:
+- `__init__`: Initialize model with number of rows, columns, and embedding dimension
+- `forward`: Make predictions given input coordinates
+- Built-in weight initialization for optimal training
+
+### ExperienceBuffer Class (complex.py)
+
+Manages the experience replay mechanism:
+- Stores past training examples
+- Provides random sampling for replay
+- Maintains a diverse set of experiences through random replacement
